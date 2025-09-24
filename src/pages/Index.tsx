@@ -1,12 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { TaskDashboard } from "@/components/dashboard/TaskDashboard";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+  const { toast } = useToast();
+
+  const handleAuthSuccess = (userData: { email: string; name: string }) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+    toast({
+      title: "Welcome!",
+      description: `Successfully logged in as ${userData.name}`,
+    });
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {!isAuthenticated ? (
+        <AuthForm onAuthSuccess={handleAuthSuccess} />
+      ) : (
+        <TaskDashboard user={user!} onLogout={handleLogout} />
+      )}
     </div>
   );
 };
